@@ -1,0 +1,56 @@
+# =========================================
+# IntelliJ / JetBrains
+# =========================================
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries/
+.idea/shelf/
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/aws.xml
+.idea/**/gradle.xml
+.idea/**/libraries/
+out/
+target/
+build/
+
+# =========================================
+# VSCode
+# =========================================
+.vscode/
+
+# =========================================
+# Python
+# =========================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+dist/
+build/
+
+# =========================================
+# 프로젝트 데이터/산출물
+# =========================================
+*.pickle
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.log
+*.tmp
+*~
+
+# Jupyter 관련 (혹시 쓴다면)
+.ipynb_checkpoints/
