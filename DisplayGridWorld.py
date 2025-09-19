@@ -1,82 +1,100 @@
-# used to draw grid worlds
+# DisplayGridWorld.py
+# draw grid world as points and connecting lines
+
 import pygame
 
 
-def displayGridWorld(maze, title, reverse=False):
+def displayGridWorld(maze, title, reverse=False, path=None, explored=None, start=None, goal=None):
     # define colors
-    black = (0, 0, 0)  # blocked
-    white = (255, 255, 255)  # unblocked
-    green = (0, 255, 0)  # start
-    red = (255, 0, 0)  # end
-    blue = (0, 0, 255)  # explored cells
-    orange = (255, 153, 0)  # shortest path
+    black = (0, 0, 0)        # background
+    white = (255, 255, 255)  # free cell
+    green = (0, 255, 0)      # start
+    red = (255, 0, 0)        # goal
+    blue = (0, 0, 255)       # explored cells
+    orange = (255, 153, 0)   # shortest path
+    yellow = (255, 255, 0)
 
-    # set width and height of window
+    # window size
     size = [850, 850]
     screen = pygame.display.set_mode(size)
 
-    # set rows, cols from maze
+    # grid size
     rows = len(maze)
     cols = len(maze[0])
     margin = 1
 
-    # 가로 칸 기준으로 정사각형 칸 크기 계산
+    # square cell
     width = (size[0] // cols) - margin
-    height = width  # 정사각형 유지
+    height = width
 
-    # 실제 그려질 전체 높이
+    # vertical padding (중앙 정렬)
     total_grid_height = rows * (height + margin)
-    # 위/아래 검은 패딩 계산
     vertical_padding = (size[1] - total_grid_height) // 2
 
-    # initialize the game engine
+    # pygame init
     pygame.init()
     pygame.display.set_caption(title)
-
-    # Loop until user closes the window
-    done = False
     clock = pygame.time.Clock()
+    done = False
 
     while not done:
-        for event in pygame.event.get():  # user did something
-            if event.type == pygame.QUIT:  # user clicked close
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 done = True
 
-        # all event processing
-
-        # code to draw
+        # background
         screen.fill(black)
 
-        # draw the grid
-        for row in range(len(maze)):
-            for column in range(len(maze[0])):
-                if maze[row][column] == 1:
-                    color = white
-                elif maze[row][column] == 2:
-                    color = black
-                elif maze[row][column] == 5:
-                    if reverse:
-                        color = red
-                    else:
-                        color = green
-                elif maze[row][column] == 10:
-                    if reverse:
-                        color = green
-                    else:
-                        color = red
-                elif maze[row][column] == 7:
-                    color = blue  # explored cells
-                else:
-                    color = orange  # shortest path
-
-                # Y좌표에 vertical_padding 추가해서 위아래 패딩 적용
-                pygame.draw.rect(screen, color, [
-                    (margin + width) * column + margin,
+        # draw grid outlines
+        for row in range(rows):
+            for col in range(cols):
+                rect = pygame.Rect(
+                    (margin + width) * col + margin,
                     (margin + height) * row + margin + vertical_padding,
                     width, height
-                ])
+                )
+                pygame.draw.rect(screen, white, rect, 1)
 
-        # 20 frames per second
+        # draw all free cells as white points
+        for row in range(rows):
+            for col in range(cols):
+                if maze[row][col] != 2:  # not a wall
+                    cx = (margin + width) * col + margin + width // 2
+                    cy = (margin + height) * row + margin + height // 2 + vertical_padding
+                    pygame.draw.circle(screen, white, (cx, cy), 5)
+
+        # draw explored cells as blue points
+        if explored:
+            for (x, y) in explored:
+                cx = (margin + width) * y + margin + width // 2
+                cy = (margin + height) * x + margin + height // 2 + vertical_padding
+                pygame.draw.circle(screen, yellow, (cx, cy), 5)
+
+        # draw shortest path as orange line
+        # draw shortest path as orange line
+        if path and len(path) > 1:
+            for i in range(len(path) - 1):
+                x1, y1 = path[i-1]
+                x2, y2 = path[i]
+                cx1 = (margin + width) * y1 + margin + width // 2
+                cy1 = (margin + height) * x1 + margin + height // 2 + vertical_padding
+                cx2 = (margin + width) * y2 + margin + width // 2
+                cy2 = (margin + height) * x2 + margin + height // 2 + vertical_padding
+                pygame.draw.line(screen, orange, (cx1, cy1), (cx2, cy2), 3)
+
+
+        # draw start & goal
+        if start:
+            sx = (margin + width) * start[1] + margin + width // 2
+            sy = (margin + height) * start[0] + margin + height // 2 + vertical_padding
+            pygame.draw.circle(screen, green, (sx, sy), 6)
+
+        if goal:
+            gx = (margin + width) * goal[1] + margin + width // 2
+            gy = (margin + height) * goal[0] + margin + height // 2 + vertical_padding
+            pygame.draw.circle(screen, red, (gx, gy), 6)
+
+        # refresh
         clock.tick(20)
         pygame.display.flip()
 
