@@ -74,14 +74,13 @@ def displayGridWorld(maze, title, reverse=False, path=None, explored=None, start
         # draw shortest path as orange line
         if path and len(path) > 1:
             for i in range(len(path) - 1):
-                x1, y1 = path[i-1]
-                x2, y2 = path[i]
+                x1, y1 = path[i]
+                x2, y2 = path[i+1]
                 cx1 = (margin + width) * y1 + margin + width // 2
                 cy1 = (margin + height) * x1 + margin + height // 2 + vertical_padding
                 cx2 = (margin + width) * y2 + margin + width // 2
                 cy2 = (margin + height) * x2 + margin + height // 2 + vertical_padding
                 pygame.draw.line(screen, orange, (cx1, cy1), (cx2, cy2), 3)
-
 
         # draw start & goal
         if start:
