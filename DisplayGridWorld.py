@@ -4,7 +4,16 @@
 import pygame
 
 
-def displayGridWorld(maze, title, reverse=False, path=None, explored=None, start=None, goal=None):
+def displayGridWorld(
+    maze,
+    title,
+    reverse=False,
+    path=None,
+    explored=None,
+    start=None,
+    goal=None,
+    total_cost=None
+):
     # define colors
     black = (0, 0, 0)        # background
     white = (255, 255, 255)  # free cell
@@ -63,7 +72,7 @@ def displayGridWorld(maze, title, reverse=False, path=None, explored=None, start
                     cy = (margin + height) * row + margin + height // 2 + vertical_padding
                     pygame.draw.circle(screen, white, (cx, cy), 5)
 
-        # draw explored cells as blue points
+        # draw explored cells as yellow points
         if explored:
             for (x, y) in explored:
                 cx = (margin + width) * y + margin + width // 2
@@ -71,11 +80,10 @@ def displayGridWorld(maze, title, reverse=False, path=None, explored=None, start
                 pygame.draw.circle(screen, yellow, (cx, cy), 5)
 
         # draw shortest path as orange line
-        # draw shortest path as orange line
         if path and len(path) > 1:
             for i in range(len(path) - 1):
                 x1, y1 = path[i]
-                x2, y2 = path[i+1]
+                x2, y2 = path[i + 1]
                 cx1 = (margin + width) * y1 + margin + width // 2
                 cy1 = (margin + height) * x1 + margin + height // 2 + vertical_padding
                 cx2 = (margin + width) * y2 + margin + width // 2
@@ -92,6 +100,12 @@ def displayGridWorld(maze, title, reverse=False, path=None, explored=None, start
             gx = (margin + width) * goal[1] + margin + width // 2
             gy = (margin + height) * goal[0] + margin + height // 2 + vertical_padding
             pygame.draw.circle(screen, red, (gx, gy), 6)
+
+        # draw info text (총 비용 & 경로 길이)
+        font = pygame.font.SysFont("Arial", 24)
+        info_text = f"Path length: {len(path)-1 if path else 0}   Cost: {total_cost if total_cost is not None else '?'}"
+        text_surface = font.render(info_text, True, white)
+        screen.blit(text_surface, (20, 20))
 
         # refresh
         clock.tick(20)

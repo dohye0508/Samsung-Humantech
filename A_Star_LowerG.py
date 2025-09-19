@@ -39,6 +39,7 @@ def a_star_search(grid_world, start, stop, edge_costs, display=False, reverse=Fa
             path.reverse()
 
             if display:
+                total_cost = g_scores.get(stop, None)
                 DisplayGridWorld.displayGridWorld(
                     grid_world,
                     title,
@@ -46,7 +47,8 @@ def a_star_search(grid_world, start, stop, edge_costs, display=False, reverse=Fa
                     path=path,
                     explored=closed_list,
                     start=start,
-                    goal=stop
+                    goal=stop,
+                    total_cost=total_cost
                 )
             return path, closed_list, g_scores.get(stop, None)
 
