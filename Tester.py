@@ -8,13 +8,13 @@ from GenerateGridWorld import generate_mazes
 # =====================
 # 사용자 입력 받기
 # =====================
-size = int(input("격자 크기를 입력하세요 (예: 20): "))
-num = int(input("생성할 미로 개수를 입력하세요 (예: 1): "))
-
+size = 20 #int(input("격자 크기를 입력하세요 (예: 20): "))
+num = 1 #int(input("생성할 미로 개수를 입력하세요 (예: 1): "))
 # =====================
 # 미로 생성
 # =====================
-all_mazes, start, stop = generate_mazes(num_of_mazes=num, size_of_square_maze=size)
+all_mazes, start, stop, edge_costs = generate_mazes(num_of_mazes=num, size_of_square_maze=size)
+
 
 # 미로 선택 (기본: 첫 번째 미로)
 x = 0
@@ -26,7 +26,8 @@ adaptive_maze = copy.deepcopy(current_maze)
 heuristic = A_Star_LowerG.manhattan_distance(start[x], stop[x])
 
 lowerg_time = time.time()
-path, explored_cells = A_Star_LowerG.a_star_search(current_maze, start[x], stop[x], True)
+path, explored_cells = A_Star_LowerG.a_star_search(current_maze, start[x], stop[x], edge_costs, True)
+
 lowerg_end = time.time()
 
 start_time = time.time()

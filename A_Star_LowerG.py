@@ -9,12 +9,13 @@ def manhattan_distance(a, b):  # heuristic function
     return abs(x1 - x2) + abs(y1 - y2)
 
 
-def a_star_search(grid_world, start, stop, display=False, reverse=False):
+def a_star_search(grid_world, start, stop, edge_costs=None, display=False, reverse=False):
     if reverse:
         title = "Reverse A Star LowerG"
         start, stop = stop, start
     else:
         title = "A Star LowerG"
+
 
     size = len(grid_world) - 1
     open_list = []
@@ -66,7 +67,9 @@ def a_star_search(grid_world, start, stop, display=False, reverse=False):
 
         if y > 0 and grid_world[x][y - 1] != 2 and (x, y - 1) not in closed_list:
             left = (x, y - 1)
-            new_g_score = previous_cost + 1
+            cost = edge_costs.get((current_cell, left), 1) if edge_costs else 1
+            new_g_score = previous_cost + cost
+
 
             if left in g_scores and g_scores[(x, y - 1)] < new_g_score:
                 parent = parents[left]
