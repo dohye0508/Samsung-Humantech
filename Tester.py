@@ -4,15 +4,11 @@ import copy
 import time
 from GenerateGridWorld import generate_mazes
 
-# =====================
-# 사용자 입력 받기
-# =====================
 size = 20  # int(input("격자 크기를 입력하세요 (예: 20): "))
 num = 1    # int(input("생성할 미로 개수를 입력하세요 (예: 1): "))
 
 # =====================
 # 미로 생성
-# =====================
 all_mazes, start, stop, edge_costs = generate_mazes(num_of_mazes=num, size_of_square_maze=size)
 
 # 미로 선택 (기본: 첫 번째 미로)

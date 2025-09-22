@@ -14,7 +14,7 @@ def displayGridWorld(
     start=None,
     goal=None,
     total_cost=None,
-    path_text=None # 새롭게 추가된 매개변수
+    path_text=None
 ):
     # define colors
     black = (0, 0, 0)
@@ -31,7 +31,9 @@ def displayGridWorld(
     # window size
     size = [850, 850]
     node_size = 5
-    screen = pygame.display.set_mode(size)
+    
+    # pygame.RESIZABLE 플래그를 추가하여 창 크기 조절 가능하게 설정
+    screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
     # grid size
     rows = len(maze)
@@ -44,7 +46,9 @@ def displayGridWorld(
 
     # vertical padding (중앙 정렬)
     total_grid_height = rows * (height + margin)
-    vertical_padding = (size[1] - total_grid_height) // 2
+    
+    # 모든 요소를 위로 올리기 위해 패딩 값 조정
+    vertical_padding = (size[1] - total_grid_height) // 2 - 150
 
     # pygame init
     pygame.init()
@@ -116,27 +120,33 @@ def displayGridWorld(
         # Draw info text and path text
         font = pygame.font.SysFont("Arial", 24)
         info_text = f"Path length: {len(path)-1 if path else 0}   Cost: {total_cost if total_cost is not None else '?'}"
+        
+        info_text_y_pos = total_grid_height + vertical_padding + 30
         text_surface = font.render(info_text, True, black)
-        screen.blit(text_surface, (20, 20))
+        screen.blit(text_surface, (20, info_text_y_pos))
 
-        # 경로 텍스트 렌더링
         if path_text:
-            text_font = pygame.font.SysFont("Arial", 18)
+            text_font = pygame.font.SysFont("Arial", 24)
             wrapped_text = ""
             current_line = ""
-            for segment in path_text.split():
-                if text_font.size(current_line + segment)[0] < size[0] - 40:
-                    current_line += segment + " "
+            
+            words_to_wrap = path_text.replace(" / ", "/").split("/")
+            
+            for i, segment in enumerate(words_to_wrap):
+                separator = " / " if i < len(words_to_wrap) - 1 else ""
+                
+                if text_font.size(current_line + segment + separator)[0] < size[0] - 40:
+                    current_line += segment + separator
                 else:
                     wrapped_text += current_line + "\n"
-                    current_line = segment + " "
+                    current_line = segment + separator
             wrapped_text += current_line
 
-            y_pos = total_grid_height + vertical_padding + 30
+            path_text_y_pos = info_text_y_pos + 40
             for line in wrapped_text.split("\n"):
                 line_surface = text_font.render(line, True, black)
-                screen.blit(line_surface, (20, y_pos))
-                y_pos += 25
+                screen.blit(line_surface, (20, path_text_y_pos))
+                path_text_y_pos += 30
 
         clock.tick(20)
         pygame.display.flip()
