@@ -19,6 +19,7 @@ def a_star_search(grid_world, start, stop, edge_costs, display=False, reverse=Fa
     closed_list = set()
     g_scores = {}
     parents = {}
+    all_explored_edges = []  # 모든 탐색된 간선을 저장할 리스트 추가
 
     # 시작점 초기화
     g_scores[start] = 0
@@ -48,7 +49,8 @@ def a_star_search(grid_world, start, stop, edge_costs, display=False, reverse=Fa
                     explored=closed_list,
                     start=start,
                     goal=stop,
-                    total_cost=total_cost
+                    total_cost=total_cost,
+                    all_edges=all_explored_edges
                 )
             return path, closed_list, g_scores.get(stop, None)
 
@@ -60,6 +62,8 @@ def a_star_search(grid_world, start, stop, edge_costs, display=False, reverse=Fa
         # edge_costs 기반으로만 이웃 탐색
         for (u, v), cost in edge_costs.items():
             if u == current_cell and v not in closed_list:
+                all_explored_edges.append((u, v))  # 탐색된 간선 추가
+
                 new_g_score = current_cost + cost
 
                 if v in g_scores and g_scores[v] < new_g_score:
@@ -78,9 +82,11 @@ def a_star_search(grid_world, start, stop, edge_costs, display=False, reverse=Fa
             grid_world,
             title,
             reverse,
-            path=[],
+            path=None,
             explored=closed_list,
             start=start,
-            goal=stop
+            goal=stop,
+            total_cost=None,
+            all_edges=all_explored_edges
         )
-    return [], closed_list, None
+    return None, closed_list, None

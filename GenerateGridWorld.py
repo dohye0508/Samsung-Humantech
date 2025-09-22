@@ -16,12 +16,24 @@ def generate_mazes(num_of_mazes=1, size_of_square_maze=None, csv_file="sample.cs
         # 나머지 행 처리
         for row in reader:
             x1, y1, x2, y2 = map(int, [row["x1"], row["y1"], row["x2"], row["y2"]])
-            c1, c2 = map(int, [row["cost1"], row["cost2"]])
+            
+            # 비용을 가져와서 '-'인 경우 무한대 값으로 설정
+            c1_str = row["cost1"]
+            c2_str = row["cost2"]
+            
+            c1 = float('inf') if c1_str == '-' else int(c1_str)
+            c2 = float('inf') if c2_str == '-' else int(c2_str)
+
             points.add((x1, y1))
             points.add((x2, y2))
             edges.append(((x1, y1), (x2, y2), c1, c2))
-            edge_costs[((x1, y1), (x2, y2))] = c1
-            edge_costs[((x2, y2), (x1, y1))] = c2
+            
+            # 비용이 무한대인 경우에만 엣지 추가 (경로 계산 제외)
+            if c1 != float('inf'):
+                edge_costs[((x1, y1), (x2, y2))] = c1
+            
+            if c2 != float('inf'):
+                edge_costs[((x2, y2), (x1, y1))] = c2
 
     # 맵 크기 계산
     max_x = max(p[0] for p in points)

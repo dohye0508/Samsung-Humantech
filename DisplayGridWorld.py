@@ -10,21 +10,27 @@ def displayGridWorld(
     reverse=False,
     path=None,
     explored=None,
+    all_edges=None,
     start=None,
     goal=None,
-    total_cost=None
+    total_cost=None,
+    path_text=None # 새롭게 추가된 매개변수
 ):
     # define colors
-    black = (0, 0, 0)        # background
-    white = (255, 255, 255)  # free cell
-    green = (0, 255, 0)      # start
-    red = (255, 0, 0)        # goal
-    blue = (0, 0, 255)       # explored cells
-    orange = (255, 153, 0)   # shortest path
-    yellow = (255, 255, 0)
-
+    black = (0, 0, 0)
+    white = (245, 245, 245)
+    green = (102, 176, 78)
+    red = (214, 82, 82)
+    blue = (0, 0, 255)
+    orange = (255, 100, 0)
+    yellow = (226, 123, 95)
+    gray = (170, 170, 187)
+    common_gray = (220, 220, 220)
+    light_gray = (237, 237, 237)
+    
     # window size
     size = [850, 850]
+    node_size = 5
     screen = pygame.display.set_mode(size)
 
     # grid size
@@ -51,10 +57,9 @@ def displayGridWorld(
             if event.type == pygame.QUIT:
                 done = True
 
-        # background
-        screen.fill(black)
+        screen.fill(light_gray)
 
-        # draw grid outlines
+        # Draw grid outlines
         for row in range(rows):
             for col in range(cols):
                 rect = pygame.Rect(
@@ -62,24 +67,18 @@ def displayGridWorld(
                     (margin + height) * row + margin + vertical_padding,
                     width, height
                 )
-                pygame.draw.rect(screen, white, rect, 1)
+                pygame.draw.rect(screen, common_gray, rect, 5)
+        
+        # Draw all explored edges (gray lines)
+        if all_edges:
+            for ((x1, y1), (x2, y2)) in all_edges:
+                cx1 = (margin + width) * y1 + margin + width // 2
+                cy1 = (margin + height) * x1 + margin + height // 2 + vertical_padding
+                cx2 = (margin + width) * y2 + margin + width // 2
+                cy2 = (margin + height) * x2 + margin + height // 2 + vertical_padding
+                pygame.draw.line(screen, gray, (cx1, cy1), (cx2, cy2), 3)
 
-        # draw all free cells as white points
-        for row in range(rows):
-            for col in range(cols):
-                if maze[row][col] != 2:  # not a wall
-                    cx = (margin + width) * col + margin + width // 2
-                    cy = (margin + height) * row + margin + height // 2 + vertical_padding
-                    pygame.draw.circle(screen, white, (cx, cy), 5)
-
-        # draw explored cells as yellow points
-        if explored:
-            for (x, y) in explored:
-                cx = (margin + width) * y + margin + width // 2
-                cy = (margin + height) * x + margin + height // 2 + vertical_padding
-                pygame.draw.circle(screen, yellow, (cx, cy), 5)
-
-        # draw shortest path as orange line
+        # Draw shortest path (black line)
         if path and len(path) > 1:
             for i in range(len(path) - 1):
                 x1, y1 = path[i]
@@ -88,26 +87,57 @@ def displayGridWorld(
                 cy1 = (margin + height) * x1 + margin + height // 2 + vertical_padding
                 cx2 = (margin + width) * y2 + margin + width // 2
                 cy2 = (margin + height) * x2 + margin + height // 2 + vertical_padding
-                pygame.draw.line(screen, orange, (cx1, cy1), (cx2, cy2), 3)
+                pygame.draw.line(screen, black, (cx1, cy1), (cx2, cy2), 3)
 
-        # draw start & goal
+        # Draw all nodes (circles)
+        for row in range(rows):
+            for col in range(cols):
+                if maze[row][col] != 2:
+                    cx = (margin + width) * col + margin + width // 2
+                    cy = (margin + height) * row + margin + height // 2 + vertical_padding
+                    pygame.draw.circle(screen, black, (cx, cy), node_size*1.1+2)
+        
+        if explored:
+            for (x, y) in explored:
+                cx = (margin + width) * y + margin + width // 2
+                cy = (margin + height) * x + margin + height // 2 + vertical_padding
+                pygame.draw.circle(screen, white, (cx, cy), node_size)
+
         if start:
             sx = (margin + width) * start[1] + margin + width // 2
             sy = (margin + height) * start[0] + margin + height // 2 + vertical_padding
-            pygame.draw.circle(screen, green, (sx, sy), 6)
+            pygame.draw.circle(screen, green, (sx, sy), node_size)
 
         if goal:
             gx = (margin + width) * goal[1] + margin + width // 2
             gy = (margin + height) * goal[0] + margin + height // 2 + vertical_padding
-            pygame.draw.circle(screen, red, (gx, gy), 6)
+            pygame.draw.circle(screen, red, (gx, gy), node_size)
 
-        # draw info text (총 비용 & 경로 길이)
+        # Draw info text and path text
         font = pygame.font.SysFont("Arial", 24)
         info_text = f"Path length: {len(path)-1 if path else 0}   Cost: {total_cost if total_cost is not None else '?'}"
-        text_surface = font.render(info_text, True, white)
+        text_surface = font.render(info_text, True, black)
         screen.blit(text_surface, (20, 20))
 
-        # refresh
+        # 경로 텍스트 렌더링
+        if path_text:
+            text_font = pygame.font.SysFont("Arial", 18)
+            wrapped_text = ""
+            current_line = ""
+            for segment in path_text.split():
+                if text_font.size(current_line + segment)[0] < size[0] - 40:
+                    current_line += segment + " "
+                else:
+                    wrapped_text += current_line + "\n"
+                    current_line = segment + " "
+            wrapped_text += current_line
+
+            y_pos = total_grid_height + vertical_padding + 30
+            for line in wrapped_text.split("\n"):
+                line_surface = text_font.render(line, True, black)
+                screen.blit(line_surface, (20, y_pos))
+                y_pos += 25
+
         clock.tick(20)
         pygame.display.flip()
 
